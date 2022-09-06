@@ -5,6 +5,7 @@ local opt = vim.opt
 opt.softtabstop = 4      -- Tab length
 opt.shiftwidth = 4       -- Indentation length
 opt.number = true        -- Line numbers on left
+opt.relativenumber = true
 opt.incsearch = true     -- Highlight as you search
 opt.hlsearch = false     -- Don't highlight after search
 opt.errorbells = false   -- No annoying error bell sounds
@@ -39,24 +40,23 @@ require('packer').startup(function()
     -- Plugin manager
     use 'wbthomason/packer.nvim'
 
-    --use 'onsails/lspkind.nvim'
-	
-    -- Snippet engine
-    use 'L3MON4D3/LuaSnip'
+    -- Native LSP
+    use 'neovim/nvim-lspconfig'
+
+    -- nvim-cmp completion sources
+    use 'hrsh7th/cmp-nvim-lua'
+    use 'hrsh7th/cmp-nvim-lsp'
+    use 'hrsh7th/cmp-buffer'
+    use 'hrsh7th/cmp-path'
+    use 'hrsh7th/cmp-cmdline'
 
     -- Completion engine
     use 'hrsh7th/nvim-cmp'
 
-    -- nvim-cmp completion sources
-    use 'neovim/nvim-lspconfig'
-    use { 'hrsh7th/cmp-nvim-lsp', after = 'nvim-cmp' }
-    use { 'hrsh7th/cmp-nvim-lua', after = 'nvim-cmp' }
-    use { 'hrsh7th/cmp-path', after = 'nvim-cmp' }
-    use { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' }
-    use { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' }
-    use 'saadparwaiz1/cmp_luasnip' -- For LuaSnip
+    -- Debugging
+    use 'mfussenegger/nvim-dap'
 
-    -- Telescope fuzzy finder
+    -- Get Telescope from release branch
     use {
 	'nvim-telescope/telescope.nvim',
 	branch = '0.1.x',
@@ -66,14 +66,16 @@ require('packer').startup(function()
 	}
     }
 
-    -- Debugging
-    use 'mfussenegger/nvim-dap' -- Debug Adapter Protocol
-    use 'leoluz/nvim-dap-go'
-    use 'rcarriga/nvim-dap-ui'
-
-    -- Treesitter better syntax highlighting
-    use 'nvim-treesitter/nvim-treesitter'
+    -- Gives telescope a better fuzzy finder
+    use {
+	'nvim-telescope/telescope-fzf-native.nvim',
+	run = 'make',
+    }
 end)
+
+-- Space doesn't move cursor
+vim.keymap.set({'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
 
 -- Completion
 local cmp_status_ok, cmp = pcall(require, 'cmp')
@@ -87,7 +89,7 @@ cmp.setup {
             require('luasnip').lsp_expand(args.body)
         end,
     },
-    mapping = cmp.mapping.preset.insert({
+    mapping = cmp.mapping.preset.insert {
 	['<C-k>'] = cmp.mapping.select_prev_item(),
 	['<C-j>'] = cmp.mapping.select_next_item(),
 	['<C-b>'] = cmp.mapping.scroll_docs(-1),
@@ -101,12 +103,12 @@ cmp.setup {
 	    c = cmp.mapping.close(),
 	},
 	['<C-Space>'] = cmp.mapping.complete(),
-    }),
+    },
     sources = {
 	{ name = 'nvim_lua' },
 	{ name = 'nvim_lsp' },
 	{ name = 'luasnip' },
-	{ name = 'buffer', keyword_length = 5 },
+	{ name = 'buffer' },
 	{ name = 'path', option = { trailing_slash = true } },
     },
     confirm_opts = {
@@ -115,53 +117,83 @@ cmp.setup {
     },
 }
 
-local lspconfig = require('lspconfig')
-
-
--- Language servers
+-- Setup lsp servers
 local on_attach = function(_, bufnr) 
     -- Mappings.
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
+    local set = vim.keymap.set
 
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-    vim.keymap.set('n', 'gT', vim.lsp.buf.type_definition, bufopts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-    vim.keymap.set('n', '<leader>wl', function()
+    set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+    set('n', 'gd', vim.lsp.buf.definition, bufopts)
+    set('n', 'gT', vim.lsp.buf.type_definition, bufopts)
+    set('n', 'gr', vim.lsp.buf.references, bufopts)
+    set('n', 'K', vim.lsp.buf.hover, bufopts)
+    set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+    set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+    set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+    set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+    set('n', '<leader>wl', function()
         print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
     end, bufopts)
-    vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-    vim.keymap.set('n', '<leader>f', vim.lsp.buf.formatting, bufopts)
+    set('n', '<leader>r', vim.lsp.buf.rename, bufopts)
+    set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+    set('n', '<leader>f', vim.lsp.buf.formatting, bufopts)
 
     -- Diagnostics
-    vim.keymap.set('n', '<leader>dk', vim.diagnostic.goto_prev, bufopts)
-    vim.keymap.set('n', '<leader>dj', vim.diagnostic.goto_next, bufopts)
-    vim.keymap.set('n', '<leader>de', vim.diagnostic.open_float, bufopts)
-    vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, bufopts)
-
+    set('n', '<leader>dk', vim.diagnostic.goto_prev, bufopts)
+    set('n', '<leader>dj', vim.diagnostic.goto_next, bufopts)
+    set('n', '<leader>de', vim.diagnostic.open_float, bufopts)
+    set('n', '<leader>dq', vim.diagnostic.setloclist, bufopts)
 end
 
-lspconfig['gopls'].setup {
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
+local lspconfig = require('lspconfig')
+
+lspconfig.gopls.setup {
     on_attach = on_attach,
+    capabilities = capabilities,
 }
 
--- Telescope
-require('telescope').setup {
+lspconfig.clangd.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+}
+
+-- Fuzzy finding
+local telescope = require('telescope')
+
+telescope.setup {
     defaults = {
         prompt_prefix = '> '
-    }
+    },
+    extensions = {
+	fzf = {
+	    fuzzy = true,
+	    override_generic_sorter = true,
+	    override_file_sorter = true,
+	    case_mode = 'smart_case',
+	}
+    },
 }
 
+-- To get fzf loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+telescope.load_extension('fzf')
+
+
+vim.keymap.set({ 'n', 'v' }, '<leader>ff', ':Telescope find_files<CR>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<leader>fg', ':Telescope live_grep<CR>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<leader>fb', ':Telescope buffers<CR>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<leader>fh', ':Telescope help_tags<CR>', { silent = true })
+
+--[[
 -- Treesitter
 require('nvim-treesitter.configs').setup {
     highlight = {
 	enable = true
     }
 }
+--]]
