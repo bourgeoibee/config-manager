@@ -45,8 +45,10 @@ require('packer').startup(function()
 
     -- Syntax highlighting
     use {
-	'nvim-treesitter/nvim-treesitter',
-        run = ':TSUpdate',
+        'nvim-treesitter/nvim-treesitter',
+        run = function()
+	    require('nvim-treesitter.install').update({ with_sync = true })
+	end,
     }
 
     -- nvim-cmp completion sources
