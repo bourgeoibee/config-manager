@@ -53,6 +53,13 @@ require('packer').startup(function()
     -- Completion engine
     use 'hrsh7th/nvim-cmp'
 
+    -- Snippet engine
+    use {
+	'L3MON4D3/LuaSnip',
+	tag = 'v<CurrentMajor>.*',
+    }
+    use 'saadparwaiz1/cmp_luasnip'
+
     -- Debugging
     use 'mfussenegger/nvim-dap'
 
