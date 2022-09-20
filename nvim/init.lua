@@ -43,6 +43,12 @@ require('packer').startup(function()
     -- Native LSP
     use 'neovim/nvim-lspconfig'
 
+    -- Syntax highlighting
+    use {
+	'nvim-treesitter/nvim-treesitter',
+        run = ':TSUpdate',
+    }
+
     -- nvim-cmp completion sources
     use 'hrsh7th/cmp-nvim-lua'
     use 'hrsh7th/cmp-nvim-lsp'
@@ -196,11 +202,9 @@ vim.keymap.set({ 'n', 'v' }, '<leader>fg', ':Telescope live_grep<CR>', { silent 
 vim.keymap.set({ 'n', 'v' }, '<leader>fb', ':Telescope buffers<CR>', { silent = true })
 vim.keymap.set({ 'n', 'v' }, '<leader>fh', ':Telescope help_tags<CR>', { silent = true })
 
---[[
 -- Treesitter
 require('nvim-treesitter.configs').setup {
     highlight = {
 	enable = true
     }
 }
---]]
