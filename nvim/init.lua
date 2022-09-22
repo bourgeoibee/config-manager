@@ -19,7 +19,7 @@ opt.autoindent = true    -- Copy indentation of current line onto new line
 opt.smartindent = true   -- Indents are inserted based on syntax
 opt.updatetime = 300     -- How many milliseconds inbetween swap file updates
 opt.termguicolors = true -- 24-bit RGB color TUI
---opt.completeopt = { "menu", "menuone", "noselect" } -- ???
+opt.completeopt = { "menu", "menuone", "noselect" } -- ???
 
 -- Plugins
 local fn = vim.fn
@@ -169,15 +169,14 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
 local lspconfig = require('lspconfig')
 
-lspconfig.gopls.setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-}
+language_servers = {'clangd', 'gopls', 'hls'}
 
-lspconfig.clangd.setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-}
+for _, ls in ipairs(language_servers) do
+    lspconfig[ls].setup {
+	on_attach = on_attach,
+	capabilities = capabilities,
+    }
+end
 
 -- Fuzzy finding
 local telescope = require('telescope')
@@ -209,6 +208,7 @@ vim.keymap.set({ 'n', 'v' }, '<leader>fh', ':Telescope help_tags<CR>', { silent 
 -- Treesitter
 require('nvim-treesitter.configs').setup {
     highlight = {
-	enable = true
+	enable = true,
+	additional_vim_regex_highlighting = false,
     }
 }
