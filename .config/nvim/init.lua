@@ -6,6 +6,7 @@ local opt = vim.opt
 
 opt.softtabstop = 4      -- Tab length
 opt.shiftwidth = 4       -- Indentation length
+opt.expandtab = true     -- Expand tabs to spaces
 opt.number = true        -- Line numbers on left
 opt.relativenumber = true
 opt.incsearch = true     -- Highlight as you search
