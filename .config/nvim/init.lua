@@ -39,12 +39,9 @@ if fn.empty(fn.glob(install_path)) > 0 then
     vim.cmd [[ packadd packer.nvim ]]
 end
 
-require('packer').startup(function()
+require('packer').startup(function(use)
     -- Plugin manager
     use 'wbthomason/packer.nvim'
-
-    -- Native LSP
-    use 'neovim/nvim-lspconfig'
 
     -- Syntax highlighting
     use {
@@ -53,6 +50,12 @@ require('packer').startup(function()
 	    require('nvim-treesitter.install').update({ with_sync = true })
 	end,
     }
+
+    -- Native LSP
+    use 'neovim/nvim-lspconfig'
+
+    -- Automatically installs language servers
+    use 'williamboman/mason.nvim'
 
     -- nvim-cmp completion sources
     use 'hrsh7th/cmp-nvim-lua'
@@ -78,7 +81,7 @@ require('packer').startup(function()
     use {
 	'nvim-telescope/telescope.nvim',
 	branch = '0.1.x',
-	requires = { 
+	requires = {
 	    { 'nvim-lua/plenary.nvim' },
 	    { 'BurntSushi/ripgrep' },
 	}
@@ -135,6 +138,11 @@ cmp.setup {
     },
 }
 
+require('mason').setup()
+
+-- Setup lua-dev before lspconfig
+require('lua-dev').setup()
+
 -- Setup lsp servers
 local on_attach = function(_, bufnr) 
     -- Mappings.
@@ -170,14 +178,34 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
 local lspconfig = require('lspconfig')
 
-language_servers = {'clangd', 'gopls', 'hls'}
+lspconfig.clangd.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+}
 
-for _, ls in ipairs(language_servers) do
-    lspconfig[ls].setup {
-	on_attach = on_attach,
-	capabilities = capabilities,
-    }
-end
+lspconfig.gopls.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+}
+
+lspconfig.hls.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+}
+
+lspconfig.sumneko_lua.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
+    settings = {
+        Lua = {
+            diagnostics = {
+                -- Get sumneko_lua to recognize the vim global
+                -- Sadly happens in all lua files not just neovim configuration files
+                globals = { 'vim' }
+            },
+        },
+    },
+}
 
 -- Fuzzy finding
 local telescope = require('telescope')
