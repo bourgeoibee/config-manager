@@ -51,11 +51,16 @@ require('packer').startup(function(use)
 	end,
     }
 
-    -- Native LSP
-    use 'neovim/nvim-lspconfig'
+    use {
+        -- Automatically installs language servers
+        "williamboman/mason.nvim",
+        -- Makes Mason and lspconfig work better together
+        "williamboman/mason-lspconfig.nvim",
+        -- Native LSP
+        "neovim/nvim-lspconfig",
+    }
 
-    -- Automatically installs language servers
-    use 'williamboman/mason.nvim'
+    --use 'folke/lua-dev.nvim'
 
     -- nvim-cmp completion sources
     use 'hrsh7th/cmp-nvim-lua'
@@ -141,10 +146,10 @@ cmp.setup {
 require('mason').setup()
 
 -- Setup lua-dev before lspconfig
-require('lua-dev').setup()
+--require('lua-dev').setup()
 
 -- Setup lsp servers
-local on_attach = function(_, bufnr) 
+local on_attach = function(_, bufnr)
     -- Mappings.
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
@@ -198,6 +203,9 @@ lspconfig.sumneko_lua.setup {
     capabilities = capabilities,
     settings = {
         Lua = {
+            completion = {
+                callSnippet = "Replace"
+            },
             diagnostics = {
                 -- Get sumneko_lua to recognize the vim global
                 -- Sadly happens in all lua files not just neovim configuration files
@@ -205,6 +213,11 @@ lspconfig.sumneko_lua.setup {
             },
         },
     },
+}
+
+lspconfig.jdtls.setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
 }
 
 -- Fuzzy finding
