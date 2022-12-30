@@ -1,6 +1,6 @@
 vim.g.mapleader = ' '
 
---vim.cmd.colorscheme('habamax')
+vim.cmd.colorscheme('habamax')
 
 local opt = vim.opt
 
