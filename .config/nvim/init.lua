@@ -11,7 +11,7 @@ if fn.empty(fn.glob(install_path)) > 0 then
         fn.system {
                 'git',
                 'clone',
-                '--depth',
+               '--depth',
                 '1',
                 'https://github.com/wbthomason/packer.nvim',
                 install_path
@@ -128,27 +128,22 @@ cmp.setup {
         },
 }
 
-require('mason').setup()
-require('mason-lspconfig').setup {
-        ensure_installed = {
-                "bashls",
-                "clangd",
-                "hls",
-                "html",
-                "jsonls",
-                "jdtls",
-                "pyright",
-                "rust_analyzer",
-                "sumneko_lua",
-        }
-}
 
--- Setup lsp servers
+-- Diagnostics
+local set = vim.keymap.set
+
+set('n', '<leader>dp', vim.diagnostic.goto_prev)
+set('n', '<leader>dn', vim.diagnostic.goto_next)
+set('n', '<leader>de', vim.diagnostic.open_float)
+set('n', '<leader>dq', vim.diagnostic.setloclist)
+
+-- LSP
+require('mason').setup()
+
 local on_attach = function(_, bufnr)
         -- Mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         local bufopts = { noremap = true, silent = true, buffer = bufnr }
-        local set = vim.keymap.set
 
         set('n', 'gD', vim.lsp.buf.declaration, bufopts)
         set('n', 'gd', vim.lsp.buf.definition, bufopts)
@@ -166,11 +161,6 @@ local on_attach = function(_, bufnr)
         set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
         set('n', '<leader>f', vim.lsp.buf.format, bufopts)
 
-        -- Diagnostics
-        set('n', '<leader>dk', vim.diagnostic.goto_prev, bufopts)
-        set('n', '<leader>dj', vim.diagnostic.goto_next, bufopts)
-        set('n', '<leader>de', vim.diagnostic.open_float, bufopts)
-        set('n', '<leader>dq', vim.diagnostic.setloclist, bufopts)
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -178,25 +168,13 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 local lspconfig = require('lspconfig')
 
-lspconfig.clangd.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-}
-
-lspconfig.gopls.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-}
-
-lspconfig.hls.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-}
-
-lspconfig.sumneko_lua.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
+local language_servers = {
+        rust_analyzer = {},
+        clangd = {},
+        gopls = {},
+        hls = {},
+        jdtls = {},
+        sumneko_lua = {
                 Lua = {
                         completion = {
                                 callSnippet = "Replace"
@@ -210,23 +188,39 @@ lspconfig.sumneko_lua.setup {
         },
 }
 
-lspconfig.jdtls.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
+
+local mason_lspconfig = require('mason-lspconfig')
+
+mason_lspconfig.setup {
+        ensure_installed = {
+                "bashls",
+                "clangd",
+                "hls",
+                "html",
+                "jsonls",
+                "pyright",
+                "rust_analyzer",
+                "sumneko_lua",
+        }
 }
 
-lspconfig.rust_analyzer.setup {
-        on_attach = on_attach,
-        capabilities = capabilities,
+mason_lspconfig.setup_handlers {
+        function(server)
+                lspconfig[server].setup {
+                        on_attach = on_attach,
+                        capabilities = capabilities,
+                        settings = language_servers[server]
+                }
+        end,
 }
 
 -- Fuzzy finding
 local telescope = require('telescope')
 
 telescope.setup {
-        defaults = {
-                prompt_prefix = '> '
-        },
+        --defaults = {
+        --        prompt_prefix = '> '
+        --},
         extensions = {
                 fzf = {
                         fuzzy = true,
@@ -241,25 +235,28 @@ telescope.setup {
 -- load_extension, somewhere after setup function:
 telescope.load_extension('fzf')
 
+local builtin = require('telescope.builtin')
 
-vim.keymap.set('n', '<leader>f?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
+vim.keymap.set('n', '<leader>f?', builtin.oldfiles, { desc = 'Find recently opened files' })
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Find by grep' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Find help' })
+
 vim.keymap.set('n', '<leader>f/', function()
-        require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
                 winblend = 10,
                 previewer = false,
         })
-end, { desc = '[/] Find in current buffer' })
-vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>', { silent = true })
-vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', { silent = true })
-vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>', { silent = true })
-vim.keymap.set('n', '<leader>fh', ':Telescope help_tags<CR>', { silent = true })
+end, { desc = 'Find in current buffer' })
 
 -- Treesitter
 require('nvim-treesitter.configs').setup {
+        ensure_installed = { 'help', 'lua', 'rust', 'c', 'cpp', 'go', 'python' },
         highlight = {
                 enable = true,
                 additional_vim_regex_highlighting = false,
-        }
+        },
 }
 
 -- Debugging
