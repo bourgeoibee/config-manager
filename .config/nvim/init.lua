@@ -1,24 +1,24 @@
 vim.g.mapleader = ' '
 
-vim.cmd.colorscheme('habamax')
+vim.cmd.colorscheme('melange')
 
 local opt = vim.opt
 
-opt.softtabstop = 8      -- Tab length
-opt.shiftwidth = 8       -- Indentation length
-opt.expandtab = true     -- Expand tabs to spaces
-opt.number = true        -- Line numbers on left
+opt.softtabstop = 8 -- Tab length
+opt.shiftwidth = 8 -- Indentation length
+opt.expandtab = true -- Expand tabs to spaces
+opt.number = true -- Line numbers on left
 opt.relativenumber = true
-opt.incsearch = true     -- Highlight as you search
-opt.hlsearch = false     -- Don't highlight after search
-opt.errorbells = false   -- No annoying error bell sounds
+opt.incsearch = true -- Highlight as you search
+opt.hlsearch = false -- Don't highlight after search
+opt.errorbells = false -- No annoying error bell sounds
 opt.visualbell = true
-opt.wrap = false         -- Disable line wrapping
+opt.wrap = false -- Disable line wrapping
 --opt.cursorline = true  -- Underline the line the cursor is on
-opt.scrolloff = 8        -- Keep 8 lines above and below cursor
-opt.autoindent = true    -- Copy indentation of current line onto new line
-opt.smartindent = true   -- Indents are inserted based on syntax
-opt.updatetime = 300     -- How many milliseconds inbetween swap file updates
+opt.scrolloff = 8 -- Keep 8 lines above and below cursor
+opt.autoindent = true -- Copy indentation of current line onto new line
+opt.smartindent = true -- Indents are inserted based on syntax
+opt.updatetime = 300 -- How many milliseconds inbetween swap file updates
 opt.termguicolors = true -- 24-bit RGB color TUI
 opt.completeopt = { "menu", "menuone", "noselect" } -- ???
 opt.mouse = ""
@@ -46,6 +46,9 @@ end
 require('packer').startup(function(use)
         -- Plugin manager
         use 'wbthomason/packer.nvim'
+
+        -- Colorschemes
+        use 'savq/melange'
 
         -- Syntax highlighting
         use {
@@ -106,7 +109,7 @@ require('packer').startup(function(use)
 end)
 
 -- Space doesn't move cursor
-vim.keymap.set({'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Completion
 local cmp_status_ok, cmp = pcall(require, 'cmp')
@@ -167,7 +170,7 @@ require('mason-lspconfig').setup {
 local on_attach = function(_, bufnr)
         -- Mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
-        local bufopts = { noremap=true, silent=true, buffer=bufnr }
+        local bufopts = { noremap = true, silent = true, buffer = bufnr }
         local set = vim.keymap.set
 
         set('n', 'gD', vim.lsp.buf.declaration, bufopts)
@@ -262,10 +265,17 @@ telescope.setup {
 telescope.load_extension('fzf')
 
 
-vim.keymap.set({ 'n', 'v' }, '<leader>ff', ':Telescope find_files<CR>', { silent = true })
-vim.keymap.set({ 'n', 'v' }, '<leader>fg', ':Telescope live_grep<CR>', { silent = true })
-vim.keymap.set({ 'n', 'v' }, '<leader>fb', ':Telescope buffers<CR>', { silent = true })
-vim.keymap.set({ 'n', 'v' }, '<leader>fh', ':Telescope help_tags<CR>', { silent = true })
+vim.keymap.set('n', '<leader>f?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
+vim.keymap.set('n', '<leader>f/', function()
+        require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+                winblend = 10,
+                previewer = false,
+        })
+end, { desc = '[/] Find in current buffer' })
+vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>', { silent = true })
+vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', { silent = true })
+vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>', { silent = true })
+vim.keymap.set('n', '<leader>fh', ':Telescope help_tags<CR>', { silent = true })
 
 -- Treesitter
 require('nvim-treesitter.configs').setup {
@@ -294,33 +304,33 @@ require('nvim-treesitter.configs').setup {
 --vim.keymap.set('n', '<F9>', dap.continue, {})
 --
 --dap.adapters.lldb = {
-        --        type = 'executable',
-        --        command = vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/scripts/codelldb',
-        --        name = 'lldb',
-        --}
-        --
-        --dap.adapters.python = {
-                --        type = 'executable',
-                --        command = vim.fn.stdpath('data') .. '/mason/packages/debugpy/debugpy',
-                --        args = { '-m', 'debugpy.adapter' },
-                --}
-                --
-                --dap.configurations.rust = {
-                        --        {
-                                --                type = 'lldb',
-                                --                request = 'launch',
-                                --                program = '${file}',
-                                --        },
-                                --}
-                                --
-                                --dap.configurations.python {
-                                        --        {
-                                                --                type = 'python',
-                                                --                request = 'launch',
-                                                --                name = "launch file",
-                                                --                program = "${file}",
-                                                --                pythonPath = function()
-                                                        --                        return '/usr/bin/python'
-                                                        --                end,
-                                                        --        },
-                                                        --}
+--        type = 'executable',
+--        command = vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/scripts/codelldb',
+--        name = 'lldb',
+--}
+--
+--dap.adapters.python = {
+--        type = 'executable',
+--        command = vim.fn.stdpath('data') .. '/mason/packages/debugpy/debugpy',
+--        args = { '-m', 'debugpy.adapter' },
+--}
+--
+--dap.configurations.rust = {
+--        {
+--                type = 'lldb',
+--                request = 'launch',
+--                program = '${file}',
+--        },
+--}
+--
+--dap.configurations.python {
+--        {
+--                type = 'python',
+--                request = 'launch',
+--                name = "launch file",
+--                program = "${file}",
+--                pythonPath = function()
+--                        return '/usr/bin/python'
+--                end,
+--        },
+--}
