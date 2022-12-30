@@ -1,6 +1,6 @@
 vim.g.mapleader = ' '
 
-vim.cmd.colorscheme('habamax')
+--vim.cmd.colorscheme('habamax')
 
 local opt = vim.opt
 
@@ -21,22 +21,26 @@ opt.smartindent = true   -- Indents are inserted based on syntax
 opt.updatetime = 300     -- How many milliseconds inbetween swap file updates
 opt.termguicolors = true -- 24-bit RGB color TUI
 opt.completeopt = { "menu", "menuone", "noselect" } -- ???
+opt.mouse = ""
 
 -- Plugins
 local fn = vim.fn
 
 -- Automatically install Packer
 local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+local packer_bootstrap = false
 if fn.empty(fn.glob(install_path)) > 0 then
-        local packer_bootstrap = fn.system {
+        packer_bootstrap = true
+        fn.system {
                 'git',
                 'clone',
                 '--depth',
                 '1',
                 'https://github.com/wbthomason/packer.nvim',
-                install_path,
+                install_path
         }
-        vim.cmd [[ packadd packer.nvim ]]
+
+        vim.cmd [[packadd packer.nvim]]
 end
 
 require('packer').startup(function(use)
@@ -94,6 +98,11 @@ require('packer').startup(function(use)
                 'nvim-telescope/telescope-fzf-native.nvim',
                 run = 'make',
         }
+
+        -- Automatically set up your configuration after cloning packer.nvim
+        if packer_bootstrap then
+                require('packer').sync()
+        end
 end)
 
 -- Space doesn't move cursor
@@ -142,15 +151,15 @@ cmp.setup {
 require('mason').setup()
 require('mason-lspconfig').setup {
         ensure_installed = {
-                "sumneko_lua",
-                "rust_analyzer",
-                "clangd",
                 "bashls",
+                "clangd",
                 "hls",
                 "html",
                 "jsonls",
                 "jdtls",
                 "pyright",
+                "rust_analyzer",
+                "sumneko_lua",
         }
 }
 
