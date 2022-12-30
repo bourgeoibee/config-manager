@@ -4,8 +4,8 @@ vim.cmd.colorscheme('habamax')
 
 local opt = vim.opt
 
-opt.softtabstop = 4      -- Tab length
-opt.shiftwidth = 4       -- Indentation length
+opt.softtabstop = 8      -- Tab length
+opt.shiftwidth = 8       -- Indentation length
 opt.expandtab = true     -- Expand tabs to spaces
 opt.number = true        -- Line numbers on left
 opt.relativenumber = true
@@ -26,9 +26,9 @@ opt.completeopt = { "menu", "menuone", "noselect" } -- ???
 local fn = vim.fn
 
 -- Automatically install Packer
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-    packer_bootstrap = fn.system {
+    local packer_bootstrap = fn.system {
 	'git',
 	'clone',
 	'--depth',
@@ -81,6 +81,8 @@ require('packer').startup(function(use)
 
     -- Debugging
     use 'mfussenegger/nvim-dap'
+    use 'rcarriga/nvim-dap-ui'
+    use 'theHamsta/nvim-dap-virtual-text'
 
     -- Get Telescope from release branch
     use {
@@ -178,29 +180,29 @@ local on_attach = function(_, bufnr)
     set('n', '<leader>dq', vim.diagnostic.setloclist, bufopts)
 end
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+--local capabilities = vim.lsp.protocol.make_client_capabilities()
+--capabilities = require('cmp_nvim_lsp').pabilities(capabilities)
 
 local lspconfig = require('lspconfig')
 
 lspconfig.clangd.setup {
     on_attach = on_attach,
-    capabilities = capabilities,
+--    capabilities = capabilities,
 }
 
 lspconfig.gopls.setup {
     on_attach = on_attach,
-    capabilities = capabilities,
+--    capabilities = capabilities,
 }
 
 lspconfig.hls.setup {
     on_attach = on_attach,
-    capabilities = capabilities,
+    --capabilities = capabilities,
 }
 
 lspconfig.sumneko_lua.setup {
     on_attach = on_attach,
-    capabilities = capabilities,
+    --capabilities = capabilities,
     settings = {
         Lua = {
             completion = {
@@ -217,7 +219,12 @@ lspconfig.sumneko_lua.setup {
 
 lspconfig.jdtls.setup {
     on_attach = on_attach,
-    capabilities = capabilities,
+    --capabilities = capabilities,
+}
+
+lspconfig.rust_analyzer.setup {
+    on_attach = on_attach,
+    --capabilities = capabilities,
 }
 
 -- Fuzzy finding
@@ -254,3 +261,53 @@ require('nvim-treesitter.configs').setup {
 	additional_vim_regex_highlighting = false,
     }
 }
+
+-- Debugging
+--{ noremap=true, silent=true, buffer=bufnr }
+--local dap = require('dap')
+--vim.keymap.set('n', '<F5>', ":lua require'dap'.continue()<CR>")
+--vim.keymap.set('n', '<F10>', ":lua require'dap'.step_over()<CR>")
+--vim.keymap.set('n', '<F11>', ":lua require'dap'.step_into()<CR>")
+--vim.keymap.set('n', '<F12>', ":lua require'dap'.step_out()<CR>")
+--vim.keymap.set('n', '<leader>b', ":lua require'dap'.toggle_breakpoint()<CR>")
+--vim.keymap.set('n', '<leader>B', ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>")
+--vim.keymap.set('n', '<leader>lp', ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>")
+--vim.keymap.set('n', '<leader>dr', ":lua require'dap'.repl.open()<CR>")
+--
+--
+--
+--vim.keymap.set('n', '<F4>', require('dapui').toggle, {})
+--vim.keymap.set('n', '<F5>', dap.toggle_breakpoint, {})
+--vim.keymap.set('n', '<F9>', dap.continue, {})
+--
+--dap.adapters.lldb = {
+--        type = 'executable',
+--        command = vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/scripts/codelldb',
+--        name = 'lldb',
+--}
+--
+--dap.adapters.python = {
+--        type = 'executable',
+--        command = vim.fn.stdpath('data') .. '/mason/packages/debugpy/debugpy',
+--        args = { '-m', 'debugpy.adapter' },
+--}
+--
+--dap.configurations.rust = {
+--        {
+--                type = 'lldb',
+--                request = 'launch',
+--                program = '${file}',
+--        },
+--}
+--
+--dap.configurations.python {
+--        {
+--                type = 'python',
+--                request = 'launch',
+--                name = "launch file",
+--                program = "${file}",
+--                pythonPath = function()
+--                        return '/usr/bin/python'
+--                end,
+--        },
+--}
