@@ -11,7 +11,7 @@ if fn.empty(fn.glob(install_path)) > 0 then
         fn.system {
                 'git',
                 'clone',
-               '--depth',
+                '--depth',
                 '1',
                 'https://github.com/wbthomason/packer.nvim',
                 install_path
@@ -23,6 +23,11 @@ end
 require('packer').startup(function(use)
         -- Plugin manager
         use 'wbthomason/packer.nvim'
+
+        use {
+                'nvim-lualine/lualine.nvim',
+                requires = { 'kyazdani42/nvim-web-devicons', opt = true },
+        }
 
         -- Colorschemes
         use 'savq/melange'
@@ -85,14 +90,26 @@ require('packer').startup(function(use)
         end
 end)
 
--- Space doesn't move cursor
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
+-- Set lualine as statusline
+-- See `:help lualine.txt`
+require('lualine').setup {
+  options = {
+    icons_enabled = false,
+    theme = 'auto',
+    component_separators = '|',
+    section_separators = '',
+  },
+}
 
 -- Completion
-local cmp_status_ok, cmp = pcall(require, 'cmp')
-if not cmp_status_ok then
-        return "Completion failed to initialize"
-end
+
+--local cmp_status_ok, cmp = pcall(require, 'cmp')
+--if not cmp_status_ok then
+--        return "Completion failed to initialize"
+--end
+
+local cmp = require('cmp')
 
 cmp.setup {
         snippet = {
@@ -103,8 +120,8 @@ cmp.setup {
         mapping = cmp.mapping.preset.insert {
                 ['<C-k>'] = cmp.mapping.select_prev_item(),
                 ['<C-j>'] = cmp.mapping.select_next_item(),
-                ['<C-b>'] = cmp.mapping.scroll_docs(-1),
-                ['<C-f>'] = cmp.mapping.scroll_docs(1),
+                ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+                ['<C-d>'] = cmp.mapping.scroll_docs(4),
                 ['<C-y>'] = cmp.mapping.confirm {
                         behavior = cmp.ConfirmBehavior.Insert,
                         select = true,
@@ -128,38 +145,34 @@ cmp.setup {
         },
 }
 
-
--- Diagnostics
-local set = vim.keymap.set
-
-set('n', '<leader>dp', vim.diagnostic.goto_prev)
-set('n', '<leader>dn', vim.diagnostic.goto_next)
-set('n', '<leader>de', vim.diagnostic.open_float)
-set('n', '<leader>dq', vim.diagnostic.setloclist)
-
 -- LSP
 require('mason').setup()
+
+local set = vim.keymap.set
 
 local on_attach = function(_, bufnr)
         -- Mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
+        local buf = vim.lsp.buf
         local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
-        set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-        set('n', 'gd', vim.lsp.buf.definition, bufopts)
-        set('n', 'gT', vim.lsp.buf.type_definition, bufopts)
-        set('n', 'gr', vim.lsp.buf.references, bufopts)
-        set('n', 'K', vim.lsp.buf.hover, bufopts)
-        set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-        set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-        set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-        set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        set('n', 'gD', buf.declaration, bufopts)
+        set('n', 'gd', buf.definition, bufopts)
+        set('n', 'gt', buf.type_definition, bufopts)
+        set('n', 'gr', buf.references, bufopts)
+        set('n', 'gi', buf.implementation, bufopts)
+
+        set('n', 'K', buf.hover, bufopts)
+        set('n', '<C-k>', buf.signature_help, bufopts)
+        set('n', '<leader>r', buf.rename, bufopts)
+        set('n', '<leader>a', buf.code_action, bufopts)
+        set('n', '<leader>f', buf.format, bufopts)
+
+        set('n', '<leader>wa', buf.add_workspace_folder, bufopts)
+        set('n', '<leader>wr', buf.remove_workspace_folder, bufopts)
         set('n', '<leader>wl', function()
                 print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
         end, bufopts)
-        set('n', '<leader>r', vim.lsp.buf.rename, bufopts)
-        set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-        set('n', '<leader>f', vim.lsp.buf.format, bufopts)
 
 end
 
@@ -167,6 +180,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 local lspconfig = require('lspconfig')
+local mason_lspconfig = require('mason-lspconfig')
 
 local language_servers = {
         rust_analyzer = {},
@@ -187,9 +201,6 @@ local language_servers = {
                 },
         },
 }
-
-
-local mason_lspconfig = require('mason-lspconfig')
 
 mason_lspconfig.setup {
         ensure_installed = {
@@ -218,9 +229,6 @@ mason_lspconfig.setup_handlers {
 local telescope = require('telescope')
 
 telescope.setup {
-        --defaults = {
-        --        prompt_prefix = '> '
-        --},
         extensions = {
                 fzf = {
                         fuzzy = true,
@@ -234,21 +242,6 @@ telescope.setup {
 -- To get fzf loaded and working with telescope, you need to call
 -- load_extension, somewhere after setup function:
 telescope.load_extension('fzf')
-
-local builtin = require('telescope.builtin')
-
-vim.keymap.set('n', '<leader>f?', builtin.oldfiles, { desc = 'Find recently opened files' })
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files' })
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Find by grep' })
-vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Find help' })
-
-vim.keymap.set('n', '<leader>f/', function()
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-                winblend = 10,
-                previewer = false,
-        })
-end, { desc = 'Find in current buffer' })
 
 -- Treesitter
 require('nvim-treesitter.configs').setup {
