@@ -1,9 +1,4 @@
-vim.g.mapleader = ' '
-
-vim.cmd.colorscheme('melange')
-
 require('options')
-
 
 -- Plugins
 local fn = vim.fn

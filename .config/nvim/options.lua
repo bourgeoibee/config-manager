@@ -1,3 +1,7 @@
+vim.g.mapleader = ' '
+
+vim.cmd.colorscheme('melange')
+
 local opt = vim.opt
 
 opt.softtabstop = 8 -- Tab length
