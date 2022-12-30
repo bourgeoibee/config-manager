@@ -73,10 +73,7 @@ require('packer').startup(function(use)
     use 'hrsh7th/nvim-cmp'
 
     -- Snippet engine
-    use {
-	'L3MON4D3/LuaSnip',
-	tag = 'v<CurrentMajor>.*',
-    }
+    use 'L3MON4D3/LuaSnip'
     use 'saadparwaiz1/cmp_luasnip'
 
     -- Debugging
@@ -103,7 +100,6 @@ end)
 
 -- Space doesn't move cursor
 vim.keymap.set({'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
 
 -- Completion
 local cmp_status_ok, cmp = pcall(require, 'cmp')
@@ -180,8 +176,13 @@ local on_attach = function(_, bufnr)
     set('n', '<leader>dq', vim.diagnostic.setloclist, bufopts)
 end
 
+<<<<<<< Updated upstream
 --local capabilities = vim.lsp.protocol.make_client_capabilities()
 --capabilities = require('cmp_nvim_lsp').pabilities(capabilities)
+=======
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+>>>>>>> Stashed changes
 
 local lspconfig = require('lspconfig')
 
