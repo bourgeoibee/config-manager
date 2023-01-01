@@ -203,16 +203,7 @@ local language_servers = {
 }
 
 mason_lspconfig.setup {
-        ensure_installed = {
-                "bashls",
-                "clangd",
-                "hls",
-                "html",
-                "jsonls",
-                "pyright",
-                "rust_analyzer",
-                "sumneko_lua",
-        }
+        ensure_installed = vim.tbl_keys(language_servers)
 }
 
 mason_lspconfig.setup_handlers {
@@ -220,7 +211,7 @@ mason_lspconfig.setup_handlers {
                 lspconfig[server].setup {
                         on_attach = on_attach,
                         capabilities = capabilities,
-                        settings = language_servers[server]
+                        settings = language_servers[server],
                 }
         end,
 }
