@@ -9,8 +9,8 @@
 
 (setq package-enable-at-startup nil)
 
-(require 'evil)
-(evil-mode t)
+;; (require 'evil)
+;; (evil-mode t)
 
 (require 'package)
 
@@ -22,8 +22,9 @@
   (package-refresh-contents)
   (package-install 'evil))
 
-(menu-bar-mode 0)
+(menu-bar-mode 1)
 (tool-bar-mode 0)
+(toggle-frame-maximized)
 (set-frame-font "JetBrains Mono-14")
 
 (custom-set-variables
@@ -39,7 +40,8 @@
  '(custom-safe-themes
    '("7923541211298e4fd1db76c388b1d2cb10f6a5c853c3da9b9c46a02b7f78c882" default))
  '(ispell-dictionary nil)
- '(package-selected-packages '(gruber-darker-theme smex evil use-package cmake-mode)))
+ '(package-selected-packages
+   '(magit tree-sitter gruber-darker-theme smex evil use-package cmake-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
