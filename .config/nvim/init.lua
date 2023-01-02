@@ -104,11 +104,6 @@ require('lualine').setup {
 
 -- Completion
 
---local cmp_status_ok, cmp = pcall(require, 'cmp')
---if not cmp_status_ok then
---        return "Completion failed to initialize"
---end
-
 local cmp = require('cmp')
 
 cmp.setup {
