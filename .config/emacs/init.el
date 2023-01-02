@@ -5,22 +5,14 @@
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
 (add-to-list 'load-path "~/.config/emacs/packages/")
-(add-to-list 'load-path "~/.config/emacs/packages/evil")
 
 (setq package-enable-at-startup nil)
-
-;; (require 'evil)
-;; (evil-mode t)
 
 (require 'package)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
-(unless (package-installed-p 'evil)
-  (package-refresh-contents)
-  (package-install 'evil))
 
 (menu-bar-mode 1)
 (tool-bar-mode 0)
