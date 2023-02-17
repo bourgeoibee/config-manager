@@ -168,6 +168,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 local lspconfig = require('lspconfig')
 local mason_lspconfig = require('mason-lspconfig')
 
+-- Auto setup and install lsp
 local language_servers = {
         rust_analyzer = {},
         clangd = {},
