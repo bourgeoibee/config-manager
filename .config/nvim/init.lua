@@ -186,6 +186,7 @@ local language_servers = {
                         },
                 },
         },
+        zls = {},
 }
 
 mason_lspconfig.setup {
