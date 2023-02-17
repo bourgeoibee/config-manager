@@ -113,19 +113,10 @@ cmp.setup {
                 end,
         },
         mapping = cmp.mapping.preset.insert {
-                ['<C-k>'] = cmp.mapping.select_prev_item(),
-                ['<C-j>'] = cmp.mapping.select_next_item(),
-                ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                ['<C-d>'] = cmp.mapping.scroll_docs(4),
-                ['<C-y>'] = cmp.mapping.confirm {
+                ['<C-Enter>'] = cmp.mapping.confirm {
                         behavior = cmp.ConfirmBehavior.Insert,
                         select = true,
                 },
-                ['<C-e>'] = cmp.mapping {
-                        i = cmp.mapping.abort(),
-                        c = cmp.mapping.close(),
-                },
-                ['<C-Space>'] = cmp.mapping.complete(),
         },
         sources = {
                 { name = 'nvim_lua' },
