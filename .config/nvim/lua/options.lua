@@ -21,3 +21,9 @@ opt.updatetime = 300 -- How many milliseconds inbetween swap file updates
 opt.termguicolors = true -- 24-bit RGB color TUI
 opt.completeopt = { 'menu', 'menuone', 'noselect' } -- ???
 opt.mouse = ''
+opt.listchars = {
+        tab = '> ',
+        lead = '·',
+        trail = '·',
+}
+opt.list = true
