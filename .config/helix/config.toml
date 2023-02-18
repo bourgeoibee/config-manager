@@ -1,0 +1,15 @@
+theme = "ayu_dark"
+
+[editor]
+line-number = "relative"
+
+[editor.cursor-shape]
+insert = "bar"
+select = "underline"
+
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+
+[editor.file-picker]
+hidden = false
