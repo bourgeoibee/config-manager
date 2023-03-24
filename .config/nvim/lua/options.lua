@@ -1,6 +1,6 @@
 vim.g.mapleader = ' '
 
-vim.cmd.colorscheme('melange')
+--vim.cmd.colorscheme('melange')
 
 local opt = vim.opt
 
