@@ -6,7 +6,7 @@ local opt = vim.opt
 
 opt.softtabstop = 8 -- Tab length
 opt.shiftwidth = 8 -- Indentation length
-opt.expandtab = true -- Expand tabs to spaces
+opt.expandtab = false -- Expand tabs to spaces
 opt.number = true -- Line numbers on left
 opt.relativenumber = true
 opt.incsearch = true -- Highlight as you search
@@ -22,8 +22,8 @@ opt.termguicolors = true -- 24-bit RGB color TUI
 opt.completeopt = { 'menu', 'menuone', 'noselect' } -- ???
 opt.mouse = ''
 opt.listchars = {
-        tab = '> ',
-        lead = '·',
-        trail = '·',
+	tab = '│ ',
+	lead = '·',
+	trail = '·',
 }
 opt.list = true
