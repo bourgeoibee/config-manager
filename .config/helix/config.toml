@@ -12,5 +12,8 @@ select = "underline"
 space = "all"
 tab = "all"
 
+[editor.whitespace.characters]
+tab = "│"
+
 [editor.file-picker]
 hidden = false
