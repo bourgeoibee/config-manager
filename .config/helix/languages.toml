@@ -1,4 +1,9 @@
 [[language]]
+name = "c"
+scope = "source.c"
+indent = { tab-width = 8, unit = "	" }
+
+[[language]]
 name = "rust"
 
 [language.config]
